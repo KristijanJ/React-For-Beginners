@@ -6,18 +6,31 @@ export default class Order extends Component {
   renderOrder = key => {
     const fish = this.props.fishes[key];
     const count = this.props.order[key];
-    const isAvailable = fish.status === "available";
-    if (!isAvailable) {
+    const isAvailable = fish && fish.status === "available";
+    // Make sure the fish is loaded before we continue
+    if (!fish) return null;
+    if (count <= 0) {
+      return null;
+    } else if (!isAvailable) {
       return (
         <li key={key}>
+          {console.log(count)}
           Sorry! {fish ? fish.name : "Fish"} is no longer available.
+          <button onClick={() => this.props.removeFromOrder(key, fish.status)}>
+            X
+          </button>
         </li>
       );
     } else {
       return (
         <li key={key}>
-          {count} lbs {fish.name}
-          {formatPrice(count * fish.price)}
+          <span>
+            {count} lbs {fish.name}
+          </span>
+          <span className="price">{formatPrice(count * fish.price)}</span>
+          <button onClick={() => this.props.removeFromOrder(key, fish.status)}>
+            X
+          </button>
         </li>
       );
     }
@@ -41,6 +54,7 @@ export default class Order extends Component {
         <h2>Order</h2>
         <ul className="order">{orderIds.map(this.renderOrder)}</ul>
         <div className="total">
+          Total:
           <strong>{formatPrice(total)}</strong>
         </div>
       </div>
